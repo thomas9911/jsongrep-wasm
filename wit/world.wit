@@ -1,0 +1,15 @@
+package jsongrep:jsongrep@0.1.0;
+
+
+interface jsongrep {
+    /// returns a list of matches and the corresponding key
+    query-with-path: func(input: string, query: string) -> result<list<tuple<string, string>>, string>;
+    /// returns only a list of matches
+    query: func(input: string, query: string) -> result<list<string>, string>;
+    /// returns only the first match
+    query-first: func(input: string, query: string) -> result<string, string>;
+}
+
+world main {
+    export jsongrep;
+}

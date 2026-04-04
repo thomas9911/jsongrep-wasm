@@ -1,0 +1,14 @@
+[package]
+name = "jsongrep-wasm"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wit-bindgen = "0.55.0"
+jsongrep = "0.8.1"
+# use the same versions as jsongrep:
+serde_json = "1.0.149"
+serde_yaml = "0.9.34"
