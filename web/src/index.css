@@ -104,69 +104,146 @@ p {
     color: rgba(255, 255, 255, 0.7);
 }
 
+/* GLOBAL STYLES */
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #121212; /* Darker background for a distinct look */
+}
+
+body {
+  margin: 0;
+  display: grid;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  position: relative;
+  background-color: #121212; /* Match root background */
+}
+
+/* Background animation background - keeping this for visual consistency */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.05;
+  background: url("./logo.svg");
+  background-size: 256px;
+  transform: rotate(-12deg) scale(1.35);
+  animation: slide 30s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes slide {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 256px 224px;
+  }
+}
+
+/* Main App Container Styling */
+.app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
 /* --- API Tester Component Styling --- */
 .api-tester {
-  margin: 2rem auto 0;
-  width: 100%;
-  max-width: 800px; /* Increased width to accommodate two inputs side-by-side */
-  text-align: left;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem; /* Increased gap */
+  gap: 1.5rem; /* Gap between Query input, Main Row, and any following elements */
 }
 
-.input-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.input-group {
+/* Layout for the Query Input (Top Row) */
+.query-input-group {
     display: flex;
     flex-direction: column;
     width: 100%;
 }
 
-.input-group label {
+/* Layout for the main content area: Output (Left) | Controls (Right/Center) */
+.main-content-row {
+    display: flex;
+    gap: 2rem; /* Space between Output and Controls */
+    width: 100%;
+    /* Ensures the main content row doesn't overflow container limits */
+    align-items: flex-start; /* Align items to the top */
+}
+
+/* Left Column: Output Box */
+.output-container {
+    flex: 1 1 30%; /* Takes up approximately 30% of the width, allowing space for the controls */
+    min-width: 300px; /* Enforce a minimum width for readability */
+}
+
+/* Right/Center Area: Data Input and Button Group */
+.data-query-controls {
+    flex: 2 1 70%; /* Takes up remaining space (approx 70%) */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* Gap between the large JSON input and the button row */
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Styling for Labels */
+label {
     font-weight: bold;
     margin-bottom: 0.4rem;
     display: block;
     color: #ccc;
 }
 
+/* Styling for all textareas (reusable style) */
 .response-area {
   width: 100%;
-  min-height: 100px; /* Slightly larger default height */
-  background: #1e1e1e; /* Slightly different dark shade */
-  border: 2px solid #444; /* Muted border */
+  border: 2px solid #444;
   border-radius: 8px;
   padding: 0.75rem;
-  color: #e0e0e0; /* Lighter text color */
+  color: #e0e0e0;
   font: monospace;
   resize: vertical;
   box-sizing: border-box;
 }
 
+/* Specific class adjustments for different input roles */
+.query-box {
+    /* Query box should be visually smaller than the JSON box */
+    min-height: 80px;
+}
+
+.large-json-box {
+    min-height: 250px; /* Make JSON box significantly larger */
+}
+
+/* Form and Button */
 .endpoint-row {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: #2c2c2c; /* Match general code background */
+  background: #2c2c2c;
   padding: 0.75rem;
   border-radius: 12px;
   font: monospace;
   border: 1px solid #444;
-  transition: 0.3s;
   width: 100%;
   box-sizing: border-box;
 }
 
-.endpoint-row:focus-within {
-  border-color: #646cff; /* Highlight on focus */
-}
-
 .send-button {
-  background: #646cff; /* Primary color for action */
+  background: #646cff;
   color: white;
   border: 0;
   padding: 0.4rem 1.2rem;
