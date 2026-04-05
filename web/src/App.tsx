@@ -4,14 +4,10 @@ import "./index.css";
 export function App() {
   return (
     <div className="app">
-      <div className="logo-container"></div>
-      <h1 style={{ marginTop: "20px" }}>Bun + React</h1>
-      <p>
-        Edit <code>src/App.tsx</code> and save to test HMR
-      </p>
-              <div className="api-tester-wrapper">
-          <APITester />
-        </div>
+      <h1 style={{ marginTop: "20px" }}>JSONGrep</h1>
+      <div className="api-tester-wrapper">
+        <APITester />
+      </div>
     </div>
   );
 }

@@ -1,166 +1,59 @@
-/* GLOBAL STYLES */
+/* Global Styles */
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #121212; /* Darker background for a distinct look */
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    color-scheme: light dark;
+    color: rgba(255, 255, 255, 0.87);
+    background-color: #121212; /* Darker background for a distinct look */
 }
 
 body {
-  margin: 0;
-  display: grid;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-  position: relative;
-  background-color: #121212; /* Match root background */
+    margin: 0;
+    display: grid;
+    place-items: center;
+    min-width: 320px;
+    min-height: 100vh;
+    position: relative;
+    background-color: #121212; /* Match root background */
 }
 
 /* Background animation background - keeping this for visual consistency */
 body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  opacity: 0.05;
-  background: url("./logo.svg");
-  background-size: 256px;
-  transform: rotate(-12deg) scale(1.35);
-  animation: slide 30s linear infinite;
-  pointer-events: none;
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    opacity: 0.05;
+    background-size: 256px;
+    transform: rotate(-12deg) scale(1.35);
+    animation: slide 30s linear infinite;
+    pointer-events: none;
 }
 
 @keyframes slide {
-  from {
-    background-position: 0 0;
-  }
-  to {
-    background-position: 256px 224px;
-  }
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: 256px 224px;
+    }
 }
 
 /* Main App Container Styling */
 .app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-  position: relative;
-  z-index: 1;
-}
-
-.logo-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 2rem;
-  margin-bottom: 2rem;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 0.3s;
-}
-
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-
-.bun-logo {
-  transform: scale(1.2);
-}
-
-.bun-logo:hover {
-  filter: drop-shadow(0 0 2em #fbf0dfaa);
-}
-
-.react-logo {
-  animation: spin 20s linear infinite;
-}
-
-.react-logo:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-h1 {
-  font-size: 3em; /* Slightly toned down from 3.2em */
-  line-height: 1.1;
-  color: #ffffff; /* Ensure titles are bright */
-}
-
-p {
-    color: rgba(255, 255, 255, 0.7);
-}
-
-/* GLOBAL STYLES */
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #121212; /* Darker background for a distinct look */
-}
-
-body {
-  margin: 0;
-  display: grid;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-  position: relative;
-  background-color: #121212; /* Match root background */
-}
-
-/* Background animation background - keeping this for visual consistency */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  opacity: 0.05;
-  background: url("./logo.svg");
-  background-size: 256px;
-  transform: rotate(-12deg) scale(1.35);
-  animation: slide 30s linear infinite;
-  pointer-events: none;
-}
-
-@keyframes slide {
-  from {
-    background-position: 0 0;
-  }
-  to {
-    background-position: 256px 224px;
-  }
-}
-
-/* Main App Container Styling */
-.app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-  position: relative;
-  z-index: 1;
+    max-width: 1600px; /* Increased max width to utilize more screen space */
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    z-index: 1;
 }
 
 /* --- API Tester Component Styling --- */
 .api-tester {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem; /* Gap between Query input, Main Row, and any following elements */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* Gap between Query input, Main Row, and any following elements */
+    width: 100%; /* Ensure the component takes full width of its parent */
 }
 
 /* Layout for the Query Input (Top Row) */
@@ -175,19 +68,20 @@ body::before {
     display: flex;
     gap: 2rem; /* Space between Output and Controls */
     width: 100%;
-    /* Ensures the main content row doesn't overflow container limits */
     align-items: flex-start; /* Align items to the top */
 }
 
 /* Left Column: Output Box */
 .output-container {
-    flex: 1 1 30%; /* Takes up approximately 30% of the width, allowing space for the controls */
+    flex: 2 1 70%; /* Takes up remaining space (approx 70%), now visually placed second */
+    order: 2; /* Placed second visually */
     min-width: 300px; /* Enforce a minimum width for readability */
 }
 
 /* Right/Center Area: Data Input and Button Group */
 .data-query-controls {
-    flex: 2 1 70%; /* Takes up remaining space (approx 70%) */
+    flex: 1 1 30%; /* Takes up approximately 30% of the width, allowing space for the controls */
+    order: 1; /* Placed first visually */
     display: flex;
     flex-direction: column;
     gap: 1.5rem; /* Gap between the large JSON input and the button row */
@@ -208,14 +102,14 @@ label {
 
 /* Styling for all textareas (reusable style) */
 .response-area {
-  width: 100%;
-  border: 2px solid #444;
-  border-radius: 8px;
-  padding: 0.75rem;
-  color: #e0e0e0;
-  font: monospace;
-  resize: vertical;
-  box-sizing: border-box;
+    width: 100%;
+    border: 2px solid #444;
+    border-radius: 8px;
+    padding: 0.75rem;
+    color: #e0e0e0;
+    font: monospace;
+    resize: vertical;
+    box-sizing: border-box;
 }
 
 /* Specific class adjustments for different input roles */
@@ -230,42 +124,43 @@ label {
 
 /* Form and Button */
 .endpoint-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: #2c2c2c;
-  padding: 0.75rem;
-  border-radius: 12px;
-  font: monospace;
-  border: 1px solid #444;
-  width: 100%;
-  box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #2c2c2c;
+    padding: 0.75rem;
+    border-radius: 12px;
+    font: monospace;
+    border: 1px solid #444;
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: center; /* Centers content within this row */
 }
 
 .send-button {
-  background: #646cff;
-  color: white;
-  border: 0;
-  padding: 0.4rem 1.2rem;
-  border-radius: 8px;
-  font-weight: 700;
-  transition: 0.1s;
-  cursor: pointer;
-  flex-shrink: 0;
+    background: #646cff;
+    color: white;
+    border: 0;
+    padding: 0.4rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 700;
+    transition: 0.1s;
+    cursor: pointer;
+    flex-shrink: 0;
 }
 
 .send-button:hover {
-  background: #5c62ff;
-  transform: translateY(-1px);
-  cursor: pointer;
+    background: #5c62ff;
+    transform: translateY(-1px);
+    cursor: pointer;
 }
 
 /* --- End of APITester Styling --- */
 
 @media (prefers-reduced-motion) {
-  *,
-  ::before,
-  ::after {
-    animation: none !important;
-  }
+    *,
+    ::before,
+    ::after {
+        animation: none !important;
+    }
 }

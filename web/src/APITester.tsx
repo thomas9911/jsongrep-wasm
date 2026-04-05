@@ -1,11 +1,16 @@
 import { useRef, type FormEvent } from "react";
 import { jsongrep } from "generated/jsongrep_wasm";
+import { useId } from "react";
 
 export function APITester() {
   // Refs for the three required areas: Data Input, Query Input, and Response Output
   const dataInputRef = useRef<HTMLTextAreaElement>(null);
   const queryInputRef = useRef<HTMLTextAreaElement>(null);
   const responseOutputRef = useRef<HTMLTextAreaElement>(null);
+
+  const queryId = useId();
+  const dataId = useId();
+  const outputId = useId();
 
   const handleTestEndpoint = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -50,9 +55,9 @@ export function APITester() {
     <div className="api-tester">
       {/* ROW 1: Query Input (Small) - Stays at the top */}
       <div className="query-input-group">
-        <label htmlFor="query-input-main">Query (DFA Pattern):</label>
+        <label htmlFor={queryId}>Query:</label>
         <textarea
-          id="query-input-main"
+          id={queryId}
           ref={queryInputRef}
           placeholder="Enter your regex-like query pattern (e.g., 'key: value')."
           className="response-area query-box"
@@ -67,6 +72,7 @@ export function APITester() {
           <textarea
             ref={responseOutputRef}
             readOnly
+            id={outputId}
             placeholder="Results from the query will appear here..."
             className="response-area output-box"
           />
@@ -76,9 +82,9 @@ export function APITester() {
         <div className="data-query-controls">
           {/* Data Input (Large) */}
           <div className="input-group large-json-input">
-            <label htmlFor="data-input-main">Data (JSON/YAML):</label>
+            <label htmlFor={dataId}>Data (JSON/YAML):</label>
             <textarea
-              id="data-input-main"
+              id={dataId}
               ref={dataInputRef}
               placeholder="Paste your JSON or YAML data here."
               className="response-area large-json-box"
