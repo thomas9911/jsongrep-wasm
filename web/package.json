@@ -7,6 +7,7 @@
     "dev": "bun --hot src/index.ts",
     "build": "bun run transpile && bun build ./src/index.html --outdir=dist --sourcemap --target=browser --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*'",
     "start": "NODE_ENV=production bun src/index.ts",
+    "jcox": "bun run jco transpile --help",
     "jco:transpile": "bun run jco transpile ../target/wasm32-wasip2/release/jsongrep_wasm.wasm -o generated",
     "jco:types": "rm -rf generated && bun run jco types -o generated ../wit",
     "transpile": "bun run jco:types && bun run jco:transpile"

@@ -16,6 +16,7 @@ run:
 
 web:
     cd web && bun install && bun run build
+    rm -r docs
     cp -r web/dist docs/
     cp web/generated/jsongrep_wasm.core.wasm docs/
     cp web/generated/jsongrep_wasm.core2.wasm docs/

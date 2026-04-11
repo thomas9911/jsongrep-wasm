@@ -6,6 +6,8 @@ export function queryFirst(input: string, query: string): string;
 export interface Timings {
   compileNs: bigint,
   queryNs: bigint,
+  parsingNs: bigint,
+  stringifyNs: bigint,
 }
 export interface TimingResults {
   timings: Timings,

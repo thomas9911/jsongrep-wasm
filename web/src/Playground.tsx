@@ -6,6 +6,8 @@ export function Playground() {
   const [data, setData] = useState("");
   const [query, setQuery] = useState("");
   const [output, setOutput] = useState("");
+  const [compileTiming, setCompileTiming] = useState("0");
+  const [queryTiming, setQueryTiming] = useState("0");
 
   const queryId = useId();
   const dataId = useId();
@@ -20,12 +22,31 @@ export function Playground() {
     }
 
     try {
-      const results: string[] = jsongrep.query(data, query);
+      const beforeRoundtrip = performance.now();
+      const resultsWithTimings: jsongrep.TimingResults =
+        jsongrep.queryWithTimings(data, query);
+      const afterRoundtrip = performance.now();
+      const roundtrip = afterRoundtrip - beforeRoundtrip;
+
+      if (localStorage.getItem("JSONGREP_TIMINGS")) {
+        console.log({ timings: resultsWithTimings.timings, roundtrip });
+      }
+      const results: string[] = resultsWithTimings.results.map(
+        ([, value]) => value,
+      );
       setOutput(
         results.length > 0
           ? results.join("\n\n---\n\n")
-          : "No results found matching the query."
+          : "No results found matching the query.",
       );
+      resultsWithTimings.timings.compileNs === 0n
+        ? setCompileTiming("< 1")
+        : setCompileTiming(
+            `${Number(resultsWithTimings.timings.compileNs) / 1e6}`,
+          );
+      resultsWithTimings.timings.queryNs === 0n
+        ? setQueryTiming("< 1")
+        : setQueryTiming(`${Number(resultsWithTimings.timings.queryNs) / 1e6}`);
     } catch (error) {
       let message = "An unknown error occurred.";
       if (typeof error === "string") message = error;
@@ -75,6 +96,9 @@ export function Playground() {
           placeholder="Results will appear here…"
           className="textarea output-box"
         />
+      </div>
+      <div>
+        compile query: {compileTiming} ms and run query: {queryTiming} ms
       </div>
     </div>
   );

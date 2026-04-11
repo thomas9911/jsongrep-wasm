@@ -64,7 +64,9 @@ impl Guest for JsonGrepper {
     }
 
     fn query_with_timings(input: String, query: String) -> Result<TimingResults, String> {
+        let before_parsing_input = monotonic_clock::now();
         let json = guess_input(&input)?;
+        let after_parsing_input = monotonic_clock::now();
 
         let before_compile_query = monotonic_clock::now();
         let dfa = QueryDFA::from_query_str(&query).map_err(|e| e.to_string())?;
@@ -74,6 +76,7 @@ impl Guest for JsonGrepper {
         let results = DFAQueryEngine::find_with_dfa(&json, &dfa);
         let after_run_query = monotonic_clock::now();
 
+        let before_serializing = monotonic_clock::now();
         let mut data = Vec::new();
         for result in &results {
             let path_parts: Vec<_> = result.path.iter().map(|x| x.to_string()).collect();
@@ -83,11 +86,15 @@ impl Guest for JsonGrepper {
                 serde_json::to_string_pretty(result.value).map_err(|e| e.to_string())?,
             ));
         }
+        let after_serializing = monotonic_clock::now();
+
         Ok(TimingResults {
             results: data,
             timings: Timings {
                 compile_ns: after_compile_query - before_compile_query,
                 query_ns: after_run_query - before_run_query,
+                parsing_ns: after_parsing_input - before_parsing_input,
+                stringify_ns: after_serializing - before_serializing,
             },
         })
     }

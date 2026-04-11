@@ -4,6 +4,8 @@ interface jsongrep {
     record timings {
         compile-ns: u64,
         query-ns: u64,
+        parsing-ns: u64,
+        stringify-ns: u64,
     }
     record timing-results {
         timings: timings,

@@ -5751,8 +5751,8 @@ function queryWithTimings(arg0, arg1) {
   let variant6;
   switch (dataView(memory0).getUint8(ret + 0, true)) {
     case 0: {
-      var len4 = dataView(memory0).getUint32(ret + 28, true);
-      var base4 = dataView(memory0).getUint32(ret + 24, true);
+      var len4 = dataView(memory0).getUint32(ret + 44, true);
+      var base4 = dataView(memory0).getUint32(ret + 40, true);
       var result4 = [];
       for (let i = 0; i < len4; i++) {
         const base = base4 + i * 16;
@@ -5770,6 +5770,8 @@ function queryWithTimings(arg0, arg1) {
           timings: {
             compileNs: BigInt.asUintN(64, BigInt(dataView(memory0).getBigInt64(ret + 8, true))),
             queryNs: BigInt.asUintN(64, BigInt(dataView(memory0).getBigInt64(ret + 16, true))),
+            parsingNs: BigInt.asUintN(64, BigInt(dataView(memory0).getBigInt64(ret + 24, true))),
+            stringifyNs: BigInt.asUintN(64, BigInt(dataView(memory0).getBigInt64(ret + 32, true))),
           },
           results: result4,
         }
