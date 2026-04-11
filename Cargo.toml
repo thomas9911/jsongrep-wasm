@@ -12,3 +12,4 @@ jsongrep = "0.8.1"
 # use the same versions as jsongrep:
 serde_json = "1.0.149"
 serde_yaml = "0.9.34"
+wasip2 = "1.0.2"

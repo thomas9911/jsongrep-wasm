@@ -1,4 +1,4 @@
-/** @module Interface wasi:filesystem/types@0.2.3 **/
+/** @module Interface wasi:filesystem/types@0.2.9 **/
 export function filesystemErrorCode(err: Error): ErrorCode | undefined;
 export type Error = import('./wasi-io-streams.js').Error;
 /**

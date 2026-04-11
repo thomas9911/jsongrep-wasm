@@ -1,10 +1,18 @@
-use crate::exports::jsongrep::jsongrep::jsongrep::Guest;
+use crate::exports::jsongrep::jsongrep::jsongrep::{Guest, TimingResults, Timings};
 use jsongrep::{
     Value,
     query::{DFAQueryEngine, QueryDFA},
 };
+use wasip2::clocks::monotonic_clock;
 
-wit_bindgen::generate!();
+wit_bindgen::generate!(
+    {
+        with: {
+            "wasi:io/poll@0.2.6": wasip2::io::poll,
+            "wasi:clocks/monotonic-clock@0.2.6": wasip2::clocks::monotonic_clock,
+        }
+    }
+);
 
 struct JsonGrepper;
 
@@ -51,10 +59,20 @@ impl Guest for JsonGrepper {
     }
 
     fn query_with_path(input: String, query: String) -> Result<Vec<(String, String)>, String> {
+        let result = Self::query_with_timings(input, query)?;
+        Ok(result.results)
+    }
+
+    fn query_with_timings(input: String, query: String) -> Result<TimingResults, String> {
         let json = guess_input(&input)?;
 
+        let before_compile_query = monotonic_clock::now();
         let dfa = QueryDFA::from_query_str(&query).map_err(|e| e.to_string())?;
+        let after_compile_query = monotonic_clock::now();
+
+        let before_run_query = monotonic_clock::now();
         let results = DFAQueryEngine::find_with_dfa(&json, &dfa);
+        let after_run_query = monotonic_clock::now();
 
         let mut data = Vec::new();
         for result in &results {
@@ -65,7 +83,13 @@ impl Guest for JsonGrepper {
                 serde_json::to_string_pretty(result.value).map_err(|e| e.to_string())?,
             ));
         }
-        Ok(data)
+        Ok(TimingResults {
+            results: data,
+            timings: Timings {
+                compile_ns: after_compile_query - before_compile_query,
+                query_ns: after_run_query - before_run_query,
+            },
+        })
     }
 }
 

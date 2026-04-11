@@ -1,5 +1,6 @@
 "use jco";
 import { environment, exit as exit$1, stderr, stdin, stdout } from '@bytecodealliance/preview2-shim/cli';
+import { monotonicClock } from '@bytecodealliance/preview2-shim/clocks';
 import { preopens, types } from '@bytecodealliance/preview2-shim/filesystem';
 import { error, streams } from '@bytecodealliance/preview2-shim/io';
 import { random } from '@bytecodealliance/preview2-shim/random';
@@ -44,6 +45,15 @@ getStdout._isHostProvided = true;
 
 if (getStdout=== undefined) {
   const err = new Error("unexpectedly undefined local import 'getStdout', was 'getStdout' available at instantiation?");
+  console.error("ERROR:", err.toString());
+  throw err;
+}
+
+const { now } = monotonicClock;
+now._isHostProvided = true;
+
+if (now=== undefined) {
+  const err = new Error("unexpectedly undefined local import 'now', was 'now' available at instantiation?");
   console.error("ERROR:", err.toString());
   throw err;
 }
@@ -3175,14 +3185,72 @@ const instantiateCore = WebAssembly.instantiate;
 
 
 let exports0;
+
+const _trampoline0 = function() {
+  _debugLog('[iface="wasi:clocks/monotonic-clock@0.2.9", function="now"] [Instruction::CallInterface] (sync, @ enter)');
+  let hostProvided = true;
+  
+  let parentTask;
+  let task;
+  let subtask;
+  
+  const createTask = () => {
+    const results = createNewCurrentTask({
+      componentIdx: -1, // 0,
+      isAsync: false,
+      entryFnName: 'now',
+      getCallbackFn: () => null,
+      callbackFnName: 'null',
+      errHandling: 'none',
+      callingWasmExport: false,
+    });
+    task = results[0];
+  };
+  
+  taskCreation: {
+    parentTask = getCurrentTask(0)?.task;
+    if (!parentTask) {
+      createTask();
+      break taskCreation;
+    }
+    
+    createTask();
+    
+    if (hostProvided) {
+      subtask = parentTask.getLatestSubtask();
+      if (!subtask) {
+        throw new Error(`Missing subtask (in parent task [${parentTask.id()}]) for host import, has the import been lowered? (ensure asyncImports are set properly)`);
+      }
+      task.setParentSubtask(subtask);
+    }
+  }
+  
+  const started = task.enterSync();
+  let ret = _withGlobalCurrentTaskMeta({
+    componentIdx: task.componentIdx(),
+    taskID: task.id(),
+    fn: () => now()
+  })
+  ;
+  _debugLog('[iface="wasi:clocks/monotonic-clock@0.2.9", function="now"][Instruction::Return]', {
+    funcName: 'now',
+    paramCount: 1,
+    async: false,
+    postReturn: false
+  });
+  task.resolve([toUint64(ret)]);
+  task.exit();
+  return toUint64(ret);
+}
+_trampoline0.fnName = 'wasi:clocks/monotonic-clock@0.2.9#now';
 let exports1;
 const handleTable1 = [T_FLAG, 0];
 const captureTable1= new Map();
 let captureCnt1 = 0;
 handleTables[1] = handleTable1;
 
-const _trampoline4 = function() {
-  _debugLog('[iface="wasi:cli/stderr@0.2.3", function="get-stderr"] [Instruction::CallInterface] (sync, @ enter)');
+const _trampoline5 = function() {
+  _debugLog('[iface="wasi:cli/stderr@0.2.9", function="get-stderr"] [Instruction::CallInterface] (sync, @ enter)');
   let hostProvided = true;
   
   let parentTask;
@@ -3236,7 +3304,7 @@ const _trampoline4 = function() {
     captureTable1.set(rep, ret);
     handle0 = rscTableCreateOwn(handleTable1, rep);
   }
-  _debugLog('[iface="wasi:cli/stderr@0.2.3", function="get-stderr"][Instruction::Return]', {
+  _debugLog('[iface="wasi:cli/stderr@0.2.9", function="get-stderr"][Instruction::Return]', {
     funcName: 'get-stderr',
     paramCount: 1,
     async: false,
@@ -3246,14 +3314,14 @@ const _trampoline4 = function() {
   task.exit();
   return handle0;
 }
-_trampoline4.fnName = 'wasi:cli/stderr@0.2.3#getStderr';
+_trampoline5.fnName = 'wasi:cli/stderr@0.2.9#getStderr';
 const handleTable2 = [T_FLAG, 0];
 const captureTable2= new Map();
 let captureCnt2 = 0;
 handleTables[2] = handleTable2;
 
-const _trampoline5 = function() {
-  _debugLog('[iface="wasi:cli/stdin@0.2.3", function="get-stdin"] [Instruction::CallInterface] (sync, @ enter)');
+const _trampoline6 = function() {
+  _debugLog('[iface="wasi:cli/stdin@0.2.9", function="get-stdin"] [Instruction::CallInterface] (sync, @ enter)');
   let hostProvided = true;
   
   let parentTask;
@@ -3307,7 +3375,7 @@ const _trampoline5 = function() {
     captureTable2.set(rep, ret);
     handle0 = rscTableCreateOwn(handleTable2, rep);
   }
-  _debugLog('[iface="wasi:cli/stdin@0.2.3", function="get-stdin"][Instruction::Return]', {
+  _debugLog('[iface="wasi:cli/stdin@0.2.9", function="get-stdin"][Instruction::Return]', {
     funcName: 'get-stdin',
     paramCount: 1,
     async: false,
@@ -3317,10 +3385,10 @@ const _trampoline5 = function() {
   task.exit();
   return handle0;
 }
-_trampoline5.fnName = 'wasi:cli/stdin@0.2.3#getStdin';
+_trampoline6.fnName = 'wasi:cli/stdin@0.2.9#getStdin';
 
-const _trampoline6 = function() {
-  _debugLog('[iface="wasi:cli/stdout@0.2.3", function="get-stdout"] [Instruction::CallInterface] (sync, @ enter)');
+const _trampoline7 = function() {
+  _debugLog('[iface="wasi:cli/stdout@0.2.9", function="get-stdout"] [Instruction::CallInterface] (sync, @ enter)');
   let hostProvided = true;
   
   let parentTask;
@@ -3374,7 +3442,7 @@ const _trampoline6 = function() {
     captureTable1.set(rep, ret);
     handle0 = rscTableCreateOwn(handleTable1, rep);
   }
-  _debugLog('[iface="wasi:cli/stdout@0.2.3", function="get-stdout"][Instruction::Return]', {
+  _debugLog('[iface="wasi:cli/stdout@0.2.9", function="get-stdout"][Instruction::Return]', {
     funcName: 'get-stdout',
     paramCount: 1,
     async: false,
@@ -3384,9 +3452,9 @@ const _trampoline6 = function() {
   task.exit();
   return handle0;
 }
-_trampoline6.fnName = 'wasi:cli/stdout@0.2.3#getStdout';
+_trampoline7.fnName = 'wasi:cli/stdout@0.2.9#getStdout';
 
-const _trampoline7 = function(arg0) {
+const _trampoline8 = function(arg0) {
   let variant0;
   switch (arg0) {
     case 0: {
@@ -3407,7 +3475,7 @@ const _trampoline7 = function(arg0) {
       throw new TypeError('invalid variant discriminant for expected');
     }
   }
-  _debugLog('[iface="wasi:cli/exit@0.2.3", function="exit"] [Instruction::CallInterface] (sync, @ enter)');
+  _debugLog('[iface="wasi:cli/exit@0.2.9", function="exit"] [Instruction::CallInterface] (sync, @ enter)');
   let hostProvided = true;
   
   let parentTask;
@@ -3452,7 +3520,7 @@ const _trampoline7 = function(arg0) {
     fn: () => exit(variant0)
   })
   ;
-  _debugLog('[iface="wasi:cli/exit@0.2.3", function="exit"][Instruction::Return]', {
+  _debugLog('[iface="wasi:cli/exit@0.2.9", function="exit"][Instruction::Return]', {
     funcName: 'exit',
     paramCount: 0,
     async: false,
@@ -3461,14 +3529,14 @@ const _trampoline7 = function(arg0) {
   task.resolve([ret]);
   task.exit();
 }
-_trampoline7.fnName = 'wasi:cli/exit@0.2.3#exit';
+_trampoline8.fnName = 'wasi:cli/exit@0.2.9#exit';
 let exports2;
 let memory0;
 let realloc0;
 let realloc0Async;
 
-const _trampoline8 = function(arg0) {
-  _debugLog('[iface="wasi:cli/environment@0.2.3", function="get-environment"] [Instruction::CallInterface] (sync, @ enter)');
+const _trampoline9 = function(arg0) {
+  _debugLog('[iface="wasi:cli/environment@0.2.9", function="get-environment"] [Instruction::CallInterface] (sync, @ enter)');
   let hostProvided = true;
   
   let parentTask;
@@ -3536,7 +3604,7 @@ const _trampoline8 = function(arg0) {
   }
   dataView(memory0).setUint32(arg0 + 4, len3, true);
   dataView(memory0).setUint32(arg0 + 0, result3, true);
-  _debugLog('[iface="wasi:cli/environment@0.2.3", function="get-environment"][Instruction::Return]', {
+  _debugLog('[iface="wasi:cli/environment@0.2.9", function="get-environment"][Instruction::Return]', {
     funcName: 'get-environment',
     paramCount: 0,
     async: false,
@@ -3545,13 +3613,13 @@ const _trampoline8 = function(arg0) {
   task.resolve([ret]);
   task.exit();
 }
-_trampoline8.fnName = 'wasi:cli/environment@0.2.3#getEnvironment';
+_trampoline9.fnName = 'wasi:cli/environment@0.2.9#getEnvironment';
 const handleTable0 = [T_FLAG, 0];
 const captureTable0= new Map();
 let captureCnt0 = 0;
 handleTables[0] = handleTable0;
 
-const _trampoline9 = function(arg0, arg1) {
+const _trampoline10 = function(arg0, arg1) {
   var handle1 = arg0;
   
   var rep2 = handleTable0[(handle1 << 1) + 1] & ~T_FLAG;
@@ -3563,7 +3631,7 @@ const _trampoline9 = function(arg0, arg1) {
   }
   
   curResourceBorrows.push(rsc0);
-  _debugLog('[iface="wasi:filesystem/types@0.2.3", function="filesystem-error-code"] [Instruction::CallInterface] (sync, @ enter)');
+  _debugLog('[iface="wasi:filesystem/types@0.2.9", function="filesystem-error-code"] [Instruction::CallInterface] (sync, @ enter)');
   let hostProvided = true;
   
   let parentTask;
@@ -3779,7 +3847,7 @@ const _trampoline9 = function(arg0, arg1) {
     }
     dataView(memory0).setInt8(arg1 + 1, enum3, true);
   }
-  _debugLog('[iface="wasi:filesystem/types@0.2.3", function="filesystem-error-code"][Instruction::Return]', {
+  _debugLog('[iface="wasi:filesystem/types@0.2.9", function="filesystem-error-code"][Instruction::Return]', {
     funcName: 'filesystem-error-code',
     paramCount: 0,
     async: false,
@@ -3788,13 +3856,13 @@ const _trampoline9 = function(arg0, arg1) {
   task.resolve([ret]);
   task.exit();
 }
-_trampoline9.fnName = 'wasi:filesystem/types@0.2.3#filesystemErrorCode';
+_trampoline10.fnName = 'wasi:filesystem/types@0.2.9#filesystemErrorCode';
 const handleTable3 = [T_FLAG, 0];
 const captureTable3= new Map();
 let captureCnt3 = 0;
 handleTables[3] = handleTable3;
 
-const _trampoline10 = function(arg0, arg1, arg2) {
+const _trampoline11 = function(arg0, arg1, arg2) {
   var handle1 = arg0;
   
   var rep2 = handleTable3[(handle1 << 1) + 1] & ~T_FLAG;
@@ -3806,7 +3874,7 @@ const _trampoline10 = function(arg0, arg1, arg2) {
   }
   
   curResourceBorrows.push(rsc0);
-  _debugLog('[iface="wasi:filesystem/types@0.2.3", function="[method]descriptor.write-via-stream"] [Instruction::CallInterface] (sync, @ enter)');
+  _debugLog('[iface="wasi:filesystem/types@0.2.9", function="[method]descriptor.write-via-stream"] [Instruction::CallInterface] (sync, @ enter)');
   let hostProvided = true;
   
   let parentTask;
@@ -4051,7 +4119,7 @@ switch (variant5.tag) {
     throw new TypeError('invalid variant specified for result');
   }
 }
-_debugLog('[iface="wasi:filesystem/types@0.2.3", function="[method]descriptor.write-via-stream"][Instruction::Return]', {
+_debugLog('[iface="wasi:filesystem/types@0.2.9", function="[method]descriptor.write-via-stream"][Instruction::Return]', {
   funcName: '[method]descriptor.write-via-stream',
   paramCount: 0,
   async: false,
@@ -4060,9 +4128,9 @@ _debugLog('[iface="wasi:filesystem/types@0.2.3", function="[method]descriptor.wr
 task.resolve([ret]);
 task.exit();
 }
-_trampoline10.fnName = 'wasi:filesystem/types@0.2.3#writeViaStream';
+_trampoline11.fnName = 'wasi:filesystem/types@0.2.9#writeViaStream';
 
-const _trampoline11 = function(arg0, arg1) {
+const _trampoline12 = function(arg0, arg1) {
   var handle1 = arg0;
   
   var rep2 = handleTable3[(handle1 << 1) + 1] & ~T_FLAG;
@@ -4074,7 +4142,7 @@ const _trampoline11 = function(arg0, arg1) {
   }
   
   curResourceBorrows.push(rsc0);
-  _debugLog('[iface="wasi:filesystem/types@0.2.3", function="[method]descriptor.append-via-stream"] [Instruction::CallInterface] (sync, @ enter)');
+  _debugLog('[iface="wasi:filesystem/types@0.2.9", function="[method]descriptor.append-via-stream"] [Instruction::CallInterface] (sync, @ enter)');
   let hostProvided = true;
   
   let parentTask;
@@ -4319,7 +4387,7 @@ switch (variant5.tag) {
     throw new TypeError('invalid variant specified for result');
   }
 }
-_debugLog('[iface="wasi:filesystem/types@0.2.3", function="[method]descriptor.append-via-stream"][Instruction::Return]', {
+_debugLog('[iface="wasi:filesystem/types@0.2.9", function="[method]descriptor.append-via-stream"][Instruction::Return]', {
   funcName: '[method]descriptor.append-via-stream',
   paramCount: 0,
   async: false,
@@ -4328,9 +4396,9 @@ _debugLog('[iface="wasi:filesystem/types@0.2.3", function="[method]descriptor.ap
 task.resolve([ret]);
 task.exit();
 }
-_trampoline11.fnName = 'wasi:filesystem/types@0.2.3#appendViaStream';
+_trampoline12.fnName = 'wasi:filesystem/types@0.2.9#appendViaStream';
 
-const _trampoline12 = function(arg0, arg1) {
+const _trampoline13 = function(arg0, arg1) {
   var handle1 = arg0;
   
   var rep2 = handleTable3[(handle1 << 1) + 1] & ~T_FLAG;
@@ -4342,7 +4410,7 @@ const _trampoline12 = function(arg0, arg1) {
   }
   
   curResourceBorrows.push(rsc0);
-  _debugLog('[iface="wasi:filesystem/types@0.2.3", function="[method]descriptor.get-type"] [Instruction::CallInterface] (sync, @ enter)');
+  _debugLog('[iface="wasi:filesystem/types@0.2.9", function="[method]descriptor.get-type"] [Instruction::CallInterface] (sync, @ enter)');
   let hostProvided = true;
   
   let parentTask;
@@ -4621,7 +4689,7 @@ switch (variant5.tag) {
     throw new TypeError('invalid variant specified for result');
   }
 }
-_debugLog('[iface="wasi:filesystem/types@0.2.3", function="[method]descriptor.get-type"][Instruction::Return]', {
+_debugLog('[iface="wasi:filesystem/types@0.2.9", function="[method]descriptor.get-type"][Instruction::Return]', {
   funcName: '[method]descriptor.get-type',
   paramCount: 0,
   async: false,
@@ -4630,9 +4698,9 @@ _debugLog('[iface="wasi:filesystem/types@0.2.3", function="[method]descriptor.ge
 task.resolve([ret]);
 task.exit();
 }
-_trampoline12.fnName = 'wasi:filesystem/types@0.2.3#getType';
+_trampoline13.fnName = 'wasi:filesystem/types@0.2.9#getType';
 
-const _trampoline13 = function(arg0, arg1) {
+const _trampoline14 = function(arg0, arg1) {
   var handle1 = arg0;
   
   var rep2 = handleTable3[(handle1 << 1) + 1] & ~T_FLAG;
@@ -4644,7 +4712,7 @@ const _trampoline13 = function(arg0, arg1) {
   }
   
   curResourceBorrows.push(rsc0);
-  _debugLog('[iface="wasi:filesystem/types@0.2.3", function="[method]descriptor.stat"] [Instruction::CallInterface] (sync, @ enter)');
+  _debugLog('[iface="wasi:filesystem/types@0.2.9", function="[method]descriptor.stat"] [Instruction::CallInterface] (sync, @ enter)');
   let hostProvided = true;
   
   let parentTask;
@@ -4956,7 +5024,7 @@ switch (variant12.tag) {
     throw new TypeError('invalid variant specified for result');
   }
 }
-_debugLog('[iface="wasi:filesystem/types@0.2.3", function="[method]descriptor.stat"][Instruction::Return]', {
+_debugLog('[iface="wasi:filesystem/types@0.2.9", function="[method]descriptor.stat"][Instruction::Return]', {
   funcName: '[method]descriptor.stat',
   paramCount: 0,
   async: false,
@@ -4965,9 +5033,9 @@ _debugLog('[iface="wasi:filesystem/types@0.2.3", function="[method]descriptor.st
 task.resolve([ret]);
 task.exit();
 }
-_trampoline13.fnName = 'wasi:filesystem/types@0.2.3#stat';
+_trampoline14.fnName = 'wasi:filesystem/types@0.2.9#stat';
 
-const _trampoline14 = function(arg0, arg1) {
+const _trampoline15 = function(arg0, arg1) {
   var handle1 = arg0;
   
   var rep2 = handleTable1[(handle1 << 1) + 1] & ~T_FLAG;
@@ -4979,7 +5047,7 @@ const _trampoline14 = function(arg0, arg1) {
   }
   
   curResourceBorrows.push(rsc0);
-  _debugLog('[iface="wasi:io/streams@0.2.3", function="[method]output-stream.check-write"] [Instruction::CallInterface] (sync, @ enter)');
+  _debugLog('[iface="wasi:io/streams@0.2.9", function="[method]output-stream.check-write"] [Instruction::CallInterface] (sync, @ enter)');
   let hostProvided = true;
   
   let parentTask;
@@ -5080,7 +5148,7 @@ switch (variant5.tag) {
     throw new TypeError('invalid variant specified for result');
   }
 }
-_debugLog('[iface="wasi:io/streams@0.2.3", function="[method]output-stream.check-write"][Instruction::Return]', {
+_debugLog('[iface="wasi:io/streams@0.2.9", function="[method]output-stream.check-write"][Instruction::Return]', {
   funcName: '[method]output-stream.check-write',
   paramCount: 0,
   async: false,
@@ -5089,9 +5157,9 @@ _debugLog('[iface="wasi:io/streams@0.2.3", function="[method]output-stream.check
 task.resolve([ret]);
 task.exit();
 }
-_trampoline14.fnName = 'wasi:io/streams@0.2.3#checkWrite';
+_trampoline15.fnName = 'wasi:io/streams@0.2.9#checkWrite';
 
-const _trampoline15 = function(arg0, arg1, arg2, arg3) {
+const _trampoline16 = function(arg0, arg1, arg2, arg3) {
   var handle1 = arg0;
   
   var rep2 = handleTable1[(handle1 << 1) + 1] & ~T_FLAG;
@@ -5106,7 +5174,7 @@ const _trampoline15 = function(arg0, arg1, arg2, arg3) {
   var ptr3 = arg1;
   var len3 = arg2;
   var result3 = new Uint8Array(memory0.buffer.slice(ptr3, ptr3 + len3 * 1));
-  _debugLog('[iface="wasi:io/streams@0.2.3", function="[method]output-stream.write"] [Instruction::CallInterface] (sync, @ enter)');
+  _debugLog('[iface="wasi:io/streams@0.2.9", function="[method]output-stream.write"] [Instruction::CallInterface] (sync, @ enter)');
   let hostProvided = true;
   
   let parentTask;
@@ -5206,7 +5274,7 @@ switch (variant6.tag) {
     throw new TypeError('invalid variant specified for result');
   }
 }
-_debugLog('[iface="wasi:io/streams@0.2.3", function="[method]output-stream.write"][Instruction::Return]', {
+_debugLog('[iface="wasi:io/streams@0.2.9", function="[method]output-stream.write"][Instruction::Return]', {
   funcName: '[method]output-stream.write',
   paramCount: 0,
   async: false,
@@ -5215,9 +5283,9 @@ _debugLog('[iface="wasi:io/streams@0.2.3", function="[method]output-stream.write
 task.resolve([ret]);
 task.exit();
 }
-_trampoline15.fnName = 'wasi:io/streams@0.2.3#write';
+_trampoline16.fnName = 'wasi:io/streams@0.2.9#write';
 
-const _trampoline16 = function(arg0, arg1) {
+const _trampoline17 = function(arg0, arg1) {
   var handle1 = arg0;
   
   var rep2 = handleTable1[(handle1 << 1) + 1] & ~T_FLAG;
@@ -5229,7 +5297,7 @@ const _trampoline16 = function(arg0, arg1) {
   }
   
   curResourceBorrows.push(rsc0);
-  _debugLog('[iface="wasi:io/streams@0.2.3", function="[method]output-stream.blocking-flush"] [Instruction::CallInterface] (sync, @ enter)');
+  _debugLog('[iface="wasi:io/streams@0.2.9", function="[method]output-stream.blocking-flush"] [Instruction::CallInterface] (sync, @ enter)');
   let hostProvided = true;
   
   let parentTask;
@@ -5329,7 +5397,7 @@ switch (variant5.tag) {
     throw new TypeError('invalid variant specified for result');
   }
 }
-_debugLog('[iface="wasi:io/streams@0.2.3", function="[method]output-stream.blocking-flush"][Instruction::Return]', {
+_debugLog('[iface="wasi:io/streams@0.2.9", function="[method]output-stream.blocking-flush"][Instruction::Return]', {
   funcName: '[method]output-stream.blocking-flush',
   paramCount: 0,
   async: false,
@@ -5338,9 +5406,9 @@ _debugLog('[iface="wasi:io/streams@0.2.3", function="[method]output-stream.block
 task.resolve([ret]);
 task.exit();
 }
-_trampoline16.fnName = 'wasi:io/streams@0.2.3#blockingFlush';
+_trampoline17.fnName = 'wasi:io/streams@0.2.9#blockingFlush';
 
-const _trampoline17 = function(arg0, arg1, arg2, arg3) {
+const _trampoline18 = function(arg0, arg1, arg2, arg3) {
   var handle1 = arg0;
   
   var rep2 = handleTable1[(handle1 << 1) + 1] & ~T_FLAG;
@@ -5355,7 +5423,7 @@ const _trampoline17 = function(arg0, arg1, arg2, arg3) {
   var ptr3 = arg1;
   var len3 = arg2;
   var result3 = new Uint8Array(memory0.buffer.slice(ptr3, ptr3 + len3 * 1));
-  _debugLog('[iface="wasi:io/streams@0.2.3", function="[method]output-stream.blocking-write-and-flush"] [Instruction::CallInterface] (sync, @ enter)');
+  _debugLog('[iface="wasi:io/streams@0.2.9", function="[method]output-stream.blocking-write-and-flush"] [Instruction::CallInterface] (sync, @ enter)');
   let hostProvided = true;
   
   let parentTask;
@@ -5455,7 +5523,7 @@ switch (variant6.tag) {
     throw new TypeError('invalid variant specified for result');
   }
 }
-_debugLog('[iface="wasi:io/streams@0.2.3", function="[method]output-stream.blocking-write-and-flush"][Instruction::Return]', {
+_debugLog('[iface="wasi:io/streams@0.2.9", function="[method]output-stream.blocking-write-and-flush"][Instruction::Return]', {
   funcName: '[method]output-stream.blocking-write-and-flush',
   paramCount: 0,
   async: false,
@@ -5464,10 +5532,10 @@ _debugLog('[iface="wasi:io/streams@0.2.3", function="[method]output-stream.block
 task.resolve([ret]);
 task.exit();
 }
-_trampoline17.fnName = 'wasi:io/streams@0.2.3#blockingWriteAndFlush';
+_trampoline18.fnName = 'wasi:io/streams@0.2.9#blockingWriteAndFlush';
 
-const _trampoline18 = function(arg0, arg1) {
-  _debugLog('[iface="wasi:random/random@0.2.3", function="get-random-bytes"] [Instruction::CallInterface] (sync, @ enter)');
+const _trampoline19 = function(arg0, arg1) {
+  _debugLog('[iface="wasi:random/random@0.2.9", function="get-random-bytes"] [Instruction::CallInterface] (sync, @ enter)');
   let hostProvided = true;
   
   let parentTask;
@@ -5535,7 +5603,7 @@ const _trampoline18 = function(arg0, arg1) {
   
   dataView(memory0).setUint32(arg1 + 4, len0, true);
   dataView(memory0).setUint32(arg1 + 0, ptr0, true);
-  _debugLog('[iface="wasi:random/random@0.2.3", function="get-random-bytes"][Instruction::Return]', {
+  _debugLog('[iface="wasi:random/random@0.2.9", function="get-random-bytes"][Instruction::Return]', {
     funcName: 'get-random-bytes',
     paramCount: 0,
     async: false,
@@ -5544,10 +5612,10 @@ const _trampoline18 = function(arg0, arg1) {
   task.resolve([ret]);
   task.exit();
 }
-_trampoline18.fnName = 'wasi:random/random@0.2.3#getRandomBytes';
+_trampoline19.fnName = 'wasi:random/random@0.2.9#getRandomBytes';
 
-const _trampoline19 = function(arg0) {
-  _debugLog('[iface="wasi:filesystem/preopens@0.2.3", function="get-directories"] [Instruction::CallInterface] (sync, @ enter)');
+const _trampoline20 = function(arg0) {
+  _debugLog('[iface="wasi:filesystem/preopens@0.2.9", function="get-directories"] [Instruction::CallInterface] (sync, @ enter)');
   let hostProvided = true;
   
   let parentTask;
@@ -5618,7 +5686,7 @@ const _trampoline19 = function(arg0) {
   }
   dataView(memory0).setUint32(arg0 + 4, len3, true);
   dataView(memory0).setUint32(arg0 + 0, result3, true);
-  _debugLog('[iface="wasi:filesystem/preopens@0.2.3", function="get-directories"][Instruction::Return]', {
+  _debugLog('[iface="wasi:filesystem/preopens@0.2.9", function="get-directories"][Instruction::Return]', {
     funcName: 'get-directories',
     paramCount: 0,
     async: false,
@@ -5627,7 +5695,7 @@ const _trampoline19 = function(arg0) {
   task.resolve([ret]);
   task.exit();
 }
-_trampoline19.fnName = 'wasi:filesystem/preopens@0.2.3#getDirectories';
+_trampoline20.fnName = 'wasi:filesystem/preopens@0.2.9#getDirectories';
 let exports3;
 let realloc1;
 let realloc1Async;
@@ -5637,6 +5705,114 @@ let postReturn1;
 let postReturn1Async;
 let postReturn2;
 let postReturn2Async;
+let postReturn3;
+let postReturn3Async;
+let jsongrep010QueryWithTimings;
+
+function queryWithTimings(arg0, arg1) {
+  
+  var encodeRes = _utf8AllocateAndEncode(arg0, realloc1, memory0);
+  var ptr0= encodeRes.ptr;
+  var len0 = encodeRes.len;
+  
+  
+  var encodeRes = _utf8AllocateAndEncode(arg1, realloc1, memory0);
+  var ptr1= encodeRes.ptr;
+  var len1 = encodeRes.len;
+  
+  _debugLog('[iface="jsongrep:jsongrep/jsongrep@0.1.0", function="query-with-timings"][Instruction::CallWasm] enter', {
+    funcName: 'query-with-timings',
+    paramCount: 4,
+    async: false,
+    postReturn: true,
+  });
+  const hostProvided = false;
+  
+  const [task, _wasm_call_currentTaskID] = createNewCurrentTask({
+    componentIdx: 0,
+    isAsync: false,
+    isManualAsync: false,
+    entryFnName: 'jsongrep010QueryWithTimings',
+    getCallbackFn: () => null,
+    callbackFnName: 'null',
+    errHandling: 'throw-result-err',
+    callingWasmExport: true,
+  });
+  
+  const started = task.enterSync();
+  task.setReturnMemoryIdx(0);
+  task.setReturnMemory(memory0);
+  let ret =   _withGlobalCurrentTaskMeta({
+    taskID: task.id(),
+    componentIdx: task.componentIdx(),
+    fn: () => jsongrep010QueryWithTimings(ptr0, len0, ptr1, len1),
+  });
+  
+  let variant6;
+  switch (dataView(memory0).getUint8(ret + 0, true)) {
+    case 0: {
+      var len4 = dataView(memory0).getUint32(ret + 28, true);
+      var base4 = dataView(memory0).getUint32(ret + 24, true);
+      var result4 = [];
+      for (let i = 0; i < len4; i++) {
+        const base = base4 + i * 16;
+        var ptr2 = dataView(memory0).getUint32(base + 0, true);
+        var len2 = dataView(memory0).getUint32(base + 4, true);
+        var result2 = TEXT_DECODER_UTF8.decode(new Uint8Array(memory0.buffer, ptr2, len2));
+        var ptr3 = dataView(memory0).getUint32(base + 8, true);
+        var len3 = dataView(memory0).getUint32(base + 12, true);
+        var result3 = TEXT_DECODER_UTF8.decode(new Uint8Array(memory0.buffer, ptr3, len3));
+        result4.push([result2, result3]);
+      }
+      variant6= {
+        tag: 'ok',
+        val: {
+          timings: {
+            compileNs: BigInt.asUintN(64, BigInt(dataView(memory0).getBigInt64(ret + 8, true))),
+            queryNs: BigInt.asUintN(64, BigInt(dataView(memory0).getBigInt64(ret + 16, true))),
+          },
+          results: result4,
+        }
+      };
+      break;
+    }
+    case 1: {
+      var ptr5 = dataView(memory0).getUint32(ret + 8, true);
+      var len5 = dataView(memory0).getUint32(ret + 12, true);
+      var result5 = TEXT_DECODER_UTF8.decode(new Uint8Array(memory0.buffer, ptr5, len5));
+      variant6= {
+        tag: 'err',
+        val: result5
+      };
+      break;
+    }
+    default: {
+      throw new TypeError('invalid variant discriminant for expected');
+    }
+  }
+  _debugLog('[iface="jsongrep:jsongrep/jsongrep@0.1.0", function="query-with-timings"][Instruction::Return]', {
+    funcName: 'query-with-timings',
+    paramCount: 1,
+    async: false,
+    postReturn: true
+  });
+  const retCopy = variant6;
+  task.resolve([retCopy.val]);
+  
+  let cstate = getOrCreateAsyncState(0);
+  cstate.mayLeave = false;
+  postReturn0(ret);
+  cstate.mayLeave = true;
+  task.exit();
+  
+  
+  
+  if (typeof retCopy === 'object' && retCopy.tag === 'err') {
+    throw new ComponentError(retCopy.val);
+  }
+  return retCopy.val;
+  
+}
 let jsongrep010QueryWithPath;
 
 function queryWithPath(arg0, arg1) {
@@ -5725,7 +5901,7 @@ function queryWithPath(arg0, arg1) {
   
   let cstate = getOrCreateAsyncState(0);
   cstate.mayLeave = false;
-  postReturn0(ret);
+  postReturn1(ret);
   cstate.mayLeave = true;
   task.exit();
   
@@ -5822,7 +5998,7 @@ function query(arg0, arg1) {
   
   let cstate = getOrCreateAsyncState(0);
   cstate.mayLeave = false;
-  postReturn1(ret);
+  postReturn2(ret);
   cstate.mayLeave = true;
   task.exit();
   
@@ -5912,7 +6088,7 @@ function queryFirst(arg0, arg1) {
   
   let cstate = getOrCreateAsyncState(0);
   cstate.mayLeave = false;
-  postReturn2(ret);
+  postReturn3(ret);
   cstate.mayLeave = true;
   task.exit();
   
@@ -5924,7 +6100,44 @@ function queryFirst(arg0, arg1) {
   return retCopy.val;
   
 }
-function trampoline0(handle) {
+let trampoline0 = _trampoline0.manuallyAsync ? new WebAssembly.Suspending(_lowerImportBackwardsCompat.bind(
+null,
+{
+  trampolineIdx: 0,
+  componentIdx: 0,
+  isAsync: false,
+  isManualAsync: _trampoline0.manuallyAsync,
+  paramLiftFns: [],
+  resultLowerFns: [_lowerFlatU64],
+  funcTypeIsAsync: false,
+  getCallbackFn: () => null,
+  getPostReturnFn: () => null,
+  isCancellable: false,
+  memoryIdx: null,
+  getMemoryFn: () => null,
+  getReallocFn: () => null,
+  importFn: _trampoline0,
+},
+)) : _lowerImportBackwardsCompat.bind(
+null,
+{
+  trampolineIdx: 0,
+  componentIdx: 0,
+  isAsync: false,
+  isManualAsync: _trampoline0.manuallyAsync,
+  paramLiftFns: [],
+  resultLowerFns: [_lowerFlatU64],
+  funcTypeIsAsync: false,
+  getCallbackFn: () => null,
+  getPostReturnFn: () => null,
+  isCancellable: false,
+  memoryIdx: null,
+  getMemoryFn: () => null,
+  getReallocFn: () => null,
+  importFn: _trampoline0,
+},
+);
+function trampoline1(handle) {
   const handleEntry = rscTableRemove(handleTable3, handle);
   if (handleEntry.own) {
     
@@ -5937,7 +6150,7 @@ function trampoline0(handle) {
     }
   }
 }
-function trampoline1(handle) {
+function trampoline2(handle) {
   const handleEntry = rscTableRemove(handleTable1, handle);
   if (handleEntry.own) {
     
@@ -5950,7 +6163,7 @@ function trampoline1(handle) {
     }
   }
 }
-function trampoline2(handle) {
+function trampoline3(handle) {
   const handleEntry = rscTableRemove(handleTable0, handle);
   if (handleEntry.own) {
     
@@ -5963,7 +6176,7 @@ function trampoline2(handle) {
     }
   }
 }
-function trampoline3(handle) {
+function trampoline4(handle) {
   const handleEntry = rscTableRemove(handleTable2, handle);
   if (handleEntry.own) {
     
@@ -5976,43 +6189,6 @@ function trampoline3(handle) {
     }
   }
 }
-let trampoline4 = _trampoline4.manuallyAsync ? new WebAssembly.Suspending(_lowerImportBackwardsCompat.bind(
-null,
-{
-  trampolineIdx: 4,
-  componentIdx: 0,
-  isAsync: false,
-  isManualAsync: _trampoline4.manuallyAsync,
-  paramLiftFns: [],
-  resultLowerFns: [_lowerFlatOwn.bind(null, 1)],
-  funcTypeIsAsync: false,
-  getCallbackFn: () => null,
-  getPostReturnFn: () => null,
-  isCancellable: false,
-  memoryIdx: null,
-  getMemoryFn: () => null,
-  getReallocFn: () => null,
-  importFn: _trampoline4,
-},
-)) : _lowerImportBackwardsCompat.bind(
-null,
-{
-  trampolineIdx: 4,
-  componentIdx: 0,
-  isAsync: false,
-  isManualAsync: _trampoline4.manuallyAsync,
-  paramLiftFns: [],
-  resultLowerFns: [_lowerFlatOwn.bind(null, 1)],
-  funcTypeIsAsync: false,
-  getCallbackFn: () => null,
-  getPostReturnFn: () => null,
-  isCancellable: false,
-  memoryIdx: null,
-  getMemoryFn: () => null,
-  getReallocFn: () => null,
-  importFn: _trampoline4,
-},
-);
 let trampoline5 = _trampoline5.manuallyAsync ? new WebAssembly.Suspending(_lowerImportBackwardsCompat.bind(
 null,
 {
@@ -6021,7 +6197,7 @@ null,
   isAsync: false,
   isManualAsync: _trampoline5.manuallyAsync,
   paramLiftFns: [],
-  resultLowerFns: [_lowerFlatOwn.bind(null, 2)],
+  resultLowerFns: [_lowerFlatOwn.bind(null, 1)],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
@@ -6039,7 +6215,7 @@ null,
   isAsync: false,
   isManualAsync: _trampoline5.manuallyAsync,
   paramLiftFns: [],
-  resultLowerFns: [_lowerFlatOwn.bind(null, 2)],
+  resultLowerFns: [_lowerFlatOwn.bind(null, 1)],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
@@ -6058,7 +6234,7 @@ null,
   isAsync: false,
   isManualAsync: _trampoline6.manuallyAsync,
   paramLiftFns: [],
-  resultLowerFns: [_lowerFlatOwn.bind(null, 1)],
+  resultLowerFns: [_lowerFlatOwn.bind(null, 2)],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
@@ -6076,7 +6252,7 @@ null,
   isAsync: false,
   isManualAsync: _trampoline6.manuallyAsync,
   paramLiftFns: [],
-  resultLowerFns: [_lowerFlatOwn.bind(null, 1)],
+  resultLowerFns: [_lowerFlatOwn.bind(null, 2)],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
@@ -6094,8 +6270,8 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline7.manuallyAsync,
-  paramLiftFns: [_liftFlatResult([['ok', null, 0, 0, 0],['err', null, 0, 0, 0],])],
-  resultLowerFns: [],
+  paramLiftFns: [],
+  resultLowerFns: [_lowerFlatOwn.bind(null, 1)],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
@@ -6112,8 +6288,8 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline7.manuallyAsync,
-  paramLiftFns: [_liftFlatResult([['ok', null, 0, 0, 0],['err', null, 0, 0, 0],])],
-  resultLowerFns: [],
+  paramLiftFns: [],
+  resultLowerFns: [_lowerFlatOwn.bind(null, 1)],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
@@ -6131,15 +6307,15 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline8.manuallyAsync,
-  paramLiftFns: [],
-  resultLowerFns: [_lowerFlatList({ elemLowerFn: _lowerFlatTuple.bind(null, 0), typeIdx: 0 })],
+  paramLiftFns: [_liftFlatResult([['ok', null, 0, 0, 0],['err', null, 0, 0, 0],])],
+  resultLowerFns: [],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
   isCancellable: false,
-  memoryIdx: 0,
-  getMemoryFn: () => memory0,
-  getReallocFn: () => realloc0,
+  memoryIdx: null,
+  getMemoryFn: () => null,
+  getReallocFn: () => null,
   importFn: _trampoline8,
 },
 )) : _lowerImportBackwardsCompat.bind(
@@ -6149,15 +6325,15 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline8.manuallyAsync,
-  paramLiftFns: [],
-  resultLowerFns: [_lowerFlatList({ elemLowerFn: _lowerFlatTuple.bind(null, 0), typeIdx: 0 })],
+  paramLiftFns: [_liftFlatResult([['ok', null, 0, 0, 0],['err', null, 0, 0, 0],])],
+  resultLowerFns: [],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
   isCancellable: false,
-  memoryIdx: 0,
-  getMemoryFn: () => memory0,
-  getReallocFn: () => realloc0,
+  memoryIdx: null,
+  getMemoryFn: () => null,
+  getReallocFn: () => null,
   importFn: _trampoline8,
 },
 );
@@ -6168,15 +6344,15 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline9.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 0)],
-  resultLowerFns: [_lowerFlatOption([[ 'some', _lowerFlatEnum.bind(null, 0), 2, 1, 1 ],[ 'none', null, 2, 1, 1 ],])],
+  paramLiftFns: [],
+  resultLowerFns: [_lowerFlatList({ elemLowerFn: _lowerFlatTuple.bind(null, 0), typeIdx: 0 })],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
   isCancellable: false,
   memoryIdx: 0,
   getMemoryFn: () => memory0,
-  getReallocFn: () => null,
+  getReallocFn: () => realloc0,
   importFn: _trampoline9,
 },
 )) : _lowerImportBackwardsCompat.bind(
@@ -6186,15 +6362,15 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline9.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 0)],
-  resultLowerFns: [_lowerFlatOption([[ 'some', _lowerFlatEnum.bind(null, 0), 2, 1, 1 ],[ 'none', null, 2, 1, 1 ],])],
+  paramLiftFns: [],
+  resultLowerFns: [_lowerFlatList({ elemLowerFn: _lowerFlatTuple.bind(null, 0), typeIdx: 0 })],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
   isCancellable: false,
   memoryIdx: 0,
   getMemoryFn: () => memory0,
-  getReallocFn: () => null,
+  getReallocFn: () => realloc0,
   importFn: _trampoline9,
 },
 );
@@ -6205,8 +6381,8 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline10.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 3),_liftFlatU64],
-  resultLowerFns: [_lowerFlatResult([[ 'ok', _lowerFlatOwn.bind(null, 1), 8, 4, 4 ],[ 'err', _lowerFlatEnum.bind(null, 0), 8, 4, 4 ],])],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 0)],
+  resultLowerFns: [_lowerFlatOption([[ 'some', _lowerFlatEnum.bind(null, 0), 2, 1, 1 ],[ 'none', null, 2, 1, 1 ],])],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
@@ -6223,8 +6399,8 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline10.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 3),_liftFlatU64],
-  resultLowerFns: [_lowerFlatResult([[ 'ok', _lowerFlatOwn.bind(null, 1), 8, 4, 4 ],[ 'err', _lowerFlatEnum.bind(null, 0), 8, 4, 4 ],])],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 0)],
+  resultLowerFns: [_lowerFlatOption([[ 'some', _lowerFlatEnum.bind(null, 0), 2, 1, 1 ],[ 'none', null, 2, 1, 1 ],])],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
@@ -6242,7 +6418,7 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline11.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 3)],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 3),_liftFlatU64],
   resultLowerFns: [_lowerFlatResult([[ 'ok', _lowerFlatOwn.bind(null, 1), 8, 4, 4 ],[ 'err', _lowerFlatEnum.bind(null, 0), 8, 4, 4 ],])],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
@@ -6260,7 +6436,7 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline11.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 3)],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 3),_liftFlatU64],
   resultLowerFns: [_lowerFlatResult([[ 'ok', _lowerFlatOwn.bind(null, 1), 8, 4, 4 ],[ 'err', _lowerFlatEnum.bind(null, 0), 8, 4, 4 ],])],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
@@ -6280,7 +6456,7 @@ null,
   isAsync: false,
   isManualAsync: _trampoline12.manuallyAsync,
   paramLiftFns: [_liftFlatBorrow.bind(null, 3)],
-  resultLowerFns: [_lowerFlatResult([[ 'ok', _lowerFlatEnum.bind(null, 1), 2, 1, 1 ],[ 'err', _lowerFlatEnum.bind(null, 0), 2, 1, 1 ],])],
+  resultLowerFns: [_lowerFlatResult([[ 'ok', _lowerFlatOwn.bind(null, 1), 8, 4, 4 ],[ 'err', _lowerFlatEnum.bind(null, 0), 8, 4, 4 ],])],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
@@ -6298,7 +6474,7 @@ null,
   isAsync: false,
   isManualAsync: _trampoline12.manuallyAsync,
   paramLiftFns: [_liftFlatBorrow.bind(null, 3)],
-  resultLowerFns: [_lowerFlatResult([[ 'ok', _lowerFlatEnum.bind(null, 1), 2, 1, 1 ],[ 'err', _lowerFlatEnum.bind(null, 0), 2, 1, 1 ],])],
+  resultLowerFns: [_lowerFlatResult([[ 'ok', _lowerFlatOwn.bind(null, 1), 8, 4, 4 ],[ 'err', _lowerFlatEnum.bind(null, 0), 8, 4, 4 ],])],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
@@ -6317,7 +6493,7 @@ null,
   isAsync: false,
   isManualAsync: _trampoline13.manuallyAsync,
   paramLiftFns: [_liftFlatBorrow.bind(null, 3)],
-  resultLowerFns: [_lowerFlatResult([[ 'ok', _lowerFlatRecord.bind(null, [['type', _lowerFlatEnum.bind(null, 1), 96, 8 ],['linkCount', _lowerFlatU64, 96, 8 ],['size', _lowerFlatU64, 96, 8 ],['dataAccessTimestamp', _lowerFlatOption([[ 'some', _lowerFlatRecord.bind(null, [['seconds', _lowerFlatU64, 16, 8 ],['nanoseconds', _lowerFlatU32, 16, 8 ],]), 24, 8, 8 ],[ 'none', null, 24, 8, 8 ],]), 96, 8 ],['dataModificationTimestamp', _lowerFlatOption([[ 'some', _lowerFlatRecord.bind(null, [['seconds', _lowerFlatU64, 16, 8 ],['nanoseconds', _lowerFlatU32, 16, 8 ],]), 24, 8, 8 ],[ 'none', null, 24, 8, 8 ],]), 96, 8 ],['statusChangeTimestamp', _lowerFlatOption([[ 'some', _lowerFlatRecord.bind(null, [['seconds', _lowerFlatU64, 16, 8 ],['nanoseconds', _lowerFlatU32, 16, 8 ],]), 24, 8, 8 ],[ 'none', null, 24, 8, 8 ],]), 96, 8 ],]), 104, 8, 8 ],[ 'err', _lowerFlatEnum.bind(null, 0), 104, 8, 8 ],])],
+  resultLowerFns: [_lowerFlatResult([[ 'ok', _lowerFlatEnum.bind(null, 1), 2, 1, 1 ],[ 'err', _lowerFlatEnum.bind(null, 0), 2, 1, 1 ],])],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
@@ -6335,7 +6511,7 @@ null,
   isAsync: false,
   isManualAsync: _trampoline13.manuallyAsync,
   paramLiftFns: [_liftFlatBorrow.bind(null, 3)],
-  resultLowerFns: [_lowerFlatResult([[ 'ok', _lowerFlatRecord.bind(null, [['type', _lowerFlatEnum.bind(null, 1), 96, 8 ],['linkCount', _lowerFlatU64, 96, 8 ],['size', _lowerFlatU64, 96, 8 ],['dataAccessTimestamp', _lowerFlatOption([[ 'some', _lowerFlatRecord.bind(null, [['seconds', _lowerFlatU64, 16, 8 ],['nanoseconds', _lowerFlatU32, 16, 8 ],]), 24, 8, 8 ],[ 'none', null, 24, 8, 8 ],]), 96, 8 ],['dataModificationTimestamp', _lowerFlatOption([[ 'some', _lowerFlatRecord.bind(null, [['seconds', _lowerFlatU64, 16, 8 ],['nanoseconds', _lowerFlatU32, 16, 8 ],]), 24, 8, 8 ],[ 'none', null, 24, 8, 8 ],]), 96, 8 ],['statusChangeTimestamp', _lowerFlatOption([[ 'some', _lowerFlatRecord.bind(null, [['seconds', _lowerFlatU64, 16, 8 ],['nanoseconds', _lowerFlatU32, 16, 8 ],]), 24, 8, 8 ],[ 'none', null, 24, 8, 8 ],]), 96, 8 ],]), 104, 8, 8 ],[ 'err', _lowerFlatEnum.bind(null, 0), 104, 8, 8 ],])],
+  resultLowerFns: [_lowerFlatResult([[ 'ok', _lowerFlatEnum.bind(null, 1), 2, 1, 1 ],[ 'err', _lowerFlatEnum.bind(null, 0), 2, 1, 1 ],])],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
@@ -6353,8 +6529,8 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline14.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 1)],
-  resultLowerFns: [_lowerFlatResult([[ 'ok', _lowerFlatU64, 16, 8, 8 ],[ 'err', _lowerFlatVariant([[ 'last-operation-failed', _lowerFlatOwn.bind(null, 0), 8, 4, 4 ],[ 'closed', null, 8, 4, 4 ],]), 16, 8, 8 ],])],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 3)],
+  resultLowerFns: [_lowerFlatResult([[ 'ok', _lowerFlatRecord.bind(null, [['type', _lowerFlatEnum.bind(null, 1), 96, 8 ],['linkCount', _lowerFlatU64, 96, 8 ],['size', _lowerFlatU64, 96, 8 ],['dataAccessTimestamp', _lowerFlatOption([[ 'some', _lowerFlatRecord.bind(null, [['seconds', _lowerFlatU64, 16, 8 ],['nanoseconds', _lowerFlatU32, 16, 8 ],]), 24, 8, 8 ],[ 'none', null, 24, 8, 8 ],]), 96, 8 ],['dataModificationTimestamp', _lowerFlatOption([[ 'some', _lowerFlatRecord.bind(null, [['seconds', _lowerFlatU64, 16, 8 ],['nanoseconds', _lowerFlatU32, 16, 8 ],]), 24, 8, 8 ],[ 'none', null, 24, 8, 8 ],]), 96, 8 ],['statusChangeTimestamp', _lowerFlatOption([[ 'some', _lowerFlatRecord.bind(null, [['seconds', _lowerFlatU64, 16, 8 ],['nanoseconds', _lowerFlatU32, 16, 8 ],]), 24, 8, 8 ],[ 'none', null, 24, 8, 8 ],]), 96, 8 ],]), 104, 8, 8 ],[ 'err', _lowerFlatEnum.bind(null, 0), 104, 8, 8 ],])],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
@@ -6371,8 +6547,8 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline14.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 1)],
-  resultLowerFns: [_lowerFlatResult([[ 'ok', _lowerFlatU64, 16, 8, 8 ],[ 'err', _lowerFlatVariant([[ 'last-operation-failed', _lowerFlatOwn.bind(null, 0), 8, 4, 4 ],[ 'closed', null, 8, 4, 4 ],]), 16, 8, 8 ],])],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 3)],
+  resultLowerFns: [_lowerFlatResult([[ 'ok', _lowerFlatRecord.bind(null, [['type', _lowerFlatEnum.bind(null, 1), 96, 8 ],['linkCount', _lowerFlatU64, 96, 8 ],['size', _lowerFlatU64, 96, 8 ],['dataAccessTimestamp', _lowerFlatOption([[ 'some', _lowerFlatRecord.bind(null, [['seconds', _lowerFlatU64, 16, 8 ],['nanoseconds', _lowerFlatU32, 16, 8 ],]), 24, 8, 8 ],[ 'none', null, 24, 8, 8 ],]), 96, 8 ],['dataModificationTimestamp', _lowerFlatOption([[ 'some', _lowerFlatRecord.bind(null, [['seconds', _lowerFlatU64, 16, 8 ],['nanoseconds', _lowerFlatU32, 16, 8 ],]), 24, 8, 8 ],[ 'none', null, 24, 8, 8 ],]), 96, 8 ],['statusChangeTimestamp', _lowerFlatOption([[ 'some', _lowerFlatRecord.bind(null, [['seconds', _lowerFlatU64, 16, 8 ],['nanoseconds', _lowerFlatU32, 16, 8 ],]), 24, 8, 8 ],[ 'none', null, 24, 8, 8 ],]), 96, 8 ],]), 104, 8, 8 ],[ 'err', _lowerFlatEnum.bind(null, 0), 104, 8, 8 ],])],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
@@ -6390,8 +6566,8 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline15.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 1),_liftFlatList({ elemLiftFn: _liftFlatU8, align32: 1, size32: 1 })],
-  resultLowerFns: [_lowerFlatResult([[ 'ok', null, 12, 4, 4 ],[ 'err', _lowerFlatVariant([[ 'last-operation-failed', _lowerFlatOwn.bind(null, 0), 8, 4, 4 ],[ 'closed', null, 8, 4, 4 ],]), 12, 4, 4 ],])],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 1)],
+  resultLowerFns: [_lowerFlatResult([[ 'ok', _lowerFlatU64, 16, 8, 8 ],[ 'err', _lowerFlatVariant([[ 'last-operation-failed', _lowerFlatOwn.bind(null, 0), 8, 4, 4 ],[ 'closed', null, 8, 4, 4 ],]), 16, 8, 8 ],])],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
@@ -6408,8 +6584,8 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline15.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 1),_liftFlatList({ elemLiftFn: _liftFlatU8, align32: 1, size32: 1 })],
-  resultLowerFns: [_lowerFlatResult([[ 'ok', null, 12, 4, 4 ],[ 'err', _lowerFlatVariant([[ 'last-operation-failed', _lowerFlatOwn.bind(null, 0), 8, 4, 4 ],[ 'closed', null, 8, 4, 4 ],]), 12, 4, 4 ],])],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 1)],
+  resultLowerFns: [_lowerFlatResult([[ 'ok', _lowerFlatU64, 16, 8, 8 ],[ 'err', _lowerFlatVariant([[ 'last-operation-failed', _lowerFlatOwn.bind(null, 0), 8, 4, 4 ],[ 'closed', null, 8, 4, 4 ],]), 16, 8, 8 ],])],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
@@ -6427,7 +6603,7 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline16.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 1)],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 1),_liftFlatList({ elemLiftFn: _liftFlatU8, align32: 1, size32: 1 })],
   resultLowerFns: [_lowerFlatResult([[ 'ok', null, 12, 4, 4 ],[ 'err', _lowerFlatVariant([[ 'last-operation-failed', _lowerFlatOwn.bind(null, 0), 8, 4, 4 ],[ 'closed', null, 8, 4, 4 ],]), 12, 4, 4 ],])],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
@@ -6445,7 +6621,7 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline16.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 1)],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 1),_liftFlatList({ elemLiftFn: _liftFlatU8, align32: 1, size32: 1 })],
   resultLowerFns: [_lowerFlatResult([[ 'ok', null, 12, 4, 4 ],[ 'err', _lowerFlatVariant([[ 'last-operation-failed', _lowerFlatOwn.bind(null, 0), 8, 4, 4 ],[ 'closed', null, 8, 4, 4 ],]), 12, 4, 4 ],])],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
@@ -6464,7 +6640,7 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline17.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 1),_liftFlatList({ elemLiftFn: _liftFlatU8, align32: 1, size32: 1 })],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 1)],
   resultLowerFns: [_lowerFlatResult([[ 'ok', null, 12, 4, 4 ],[ 'err', _lowerFlatVariant([[ 'last-operation-failed', _lowerFlatOwn.bind(null, 0), 8, 4, 4 ],[ 'closed', null, 8, 4, 4 ],]), 12, 4, 4 ],])],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
@@ -6482,7 +6658,7 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline17.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 1),_liftFlatList({ elemLiftFn: _liftFlatU8, align32: 1, size32: 1 })],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 1)],
   resultLowerFns: [_lowerFlatResult([[ 'ok', null, 12, 4, 4 ],[ 'err', _lowerFlatVariant([[ 'last-operation-failed', _lowerFlatOwn.bind(null, 0), 8, 4, 4 ],[ 'closed', null, 8, 4, 4 ],]), 12, 4, 4 ],])],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
@@ -6501,15 +6677,15 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline18.manuallyAsync,
-  paramLiftFns: [_liftFlatU64],
-  resultLowerFns: [_lowerFlatList({ elemLowerFn: _lowerFlatU8, typeIdx: 1 })],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 1),_liftFlatList({ elemLiftFn: _liftFlatU8, align32: 1, size32: 1 })],
+  resultLowerFns: [_lowerFlatResult([[ 'ok', null, 12, 4, 4 ],[ 'err', _lowerFlatVariant([[ 'last-operation-failed', _lowerFlatOwn.bind(null, 0), 8, 4, 4 ],[ 'closed', null, 8, 4, 4 ],]), 12, 4, 4 ],])],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
   isCancellable: false,
   memoryIdx: 0,
   getMemoryFn: () => memory0,
-  getReallocFn: () => realloc0,
+  getReallocFn: () => null,
   importFn: _trampoline18,
 },
 )) : _lowerImportBackwardsCompat.bind(
@@ -6519,15 +6695,15 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline18.manuallyAsync,
-  paramLiftFns: [_liftFlatU64],
-  resultLowerFns: [_lowerFlatList({ elemLowerFn: _lowerFlatU8, typeIdx: 1 })],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 1),_liftFlatList({ elemLiftFn: _liftFlatU8, align32: 1, size32: 1 })],
+  resultLowerFns: [_lowerFlatResult([[ 'ok', null, 12, 4, 4 ],[ 'err', _lowerFlatVariant([[ 'last-operation-failed', _lowerFlatOwn.bind(null, 0), 8, 4, 4 ],[ 'closed', null, 8, 4, 4 ],]), 12, 4, 4 ],])],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
   isCancellable: false,
   memoryIdx: 0,
   getMemoryFn: () => memory0,
-  getReallocFn: () => realloc0,
+  getReallocFn: () => null,
   importFn: _trampoline18,
 },
 );
@@ -6538,8 +6714,8 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline19.manuallyAsync,
-  paramLiftFns: [],
-  resultLowerFns: [_lowerFlatList({ elemLowerFn: _lowerFlatTuple.bind(null, 17), typeIdx: 2 })],
+  paramLiftFns: [_liftFlatU64],
+  resultLowerFns: [_lowerFlatList({ elemLowerFn: _lowerFlatU8, typeIdx: 1 })],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
@@ -6556,8 +6732,8 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline19.manuallyAsync,
-  paramLiftFns: [],
-  resultLowerFns: [_lowerFlatList({ elemLowerFn: _lowerFlatTuple.bind(null, 17), typeIdx: 2 })],
+  paramLiftFns: [_liftFlatU64],
+  resultLowerFns: [_lowerFlatList({ elemLowerFn: _lowerFlatU8, typeIdx: 1 })],
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
@@ -6566,6 +6742,43 @@ null,
   getMemoryFn: () => memory0,
   getReallocFn: () => realloc0,
   importFn: _trampoline19,
+},
+);
+let trampoline20 = _trampoline20.manuallyAsync ? new WebAssembly.Suspending(_lowerImportBackwardsCompat.bind(
+null,
+{
+  trampolineIdx: 20,
+  componentIdx: 0,
+  isAsync: false,
+  isManualAsync: _trampoline20.manuallyAsync,
+  paramLiftFns: [],
+  resultLowerFns: [_lowerFlatList({ elemLowerFn: _lowerFlatTuple.bind(null, 18), typeIdx: 2 })],
+  funcTypeIsAsync: false,
+  getCallbackFn: () => null,
+  getPostReturnFn: () => null,
+  isCancellable: false,
+  memoryIdx: 0,
+  getMemoryFn: () => memory0,
+  getReallocFn: () => realloc0,
+  importFn: _trampoline20,
+},
+)) : _lowerImportBackwardsCompat.bind(
+null,
+{
+  trampolineIdx: 20,
+  componentIdx: 0,
+  isAsync: false,
+  isManualAsync: _trampoline20.manuallyAsync,
+  paramLiftFns: [],
+  resultLowerFns: [_lowerFlatList({ elemLowerFn: _lowerFlatTuple.bind(null, 18), typeIdx: 2 })],
+  funcTypeIsAsync: false,
+  getCallbackFn: () => null,
+  getPostReturnFn: () => null,
+  isCancellable: false,
+  memoryIdx: 0,
+  getMemoryFn: () => memory0,
+  getReallocFn: () => realloc0,
+  importFn: _trampoline20,
 },
 );
 
@@ -6577,6 +6790,9 @@ const $init = (() => {
     const module3 = base64Compile('AGFzbQEAAAABLghgBH9/f38Bf2ACf38Bf2ABfwBgAX8AYAJ/fwBgA39+fwBgBH9/f38AYAJ+fwACbBIAATAAAAABMQABAAEyAAEAATMAAQABNAACAAE1AAMAATYABAABNwAFAAE4AAQAATkABAACMTAABAACMTEABAACMTIABgACMTMABAACMTQABgACMTUABwACMTYAAwAIJGltcG9ydHMBcAEREQkXAQBBAAsRAAECAwQFBgcICQoLDA0ODxAALwlwcm9kdWNlcnMBDHByb2Nlc3NlZC1ieQENd2l0LWNvbXBvbmVudAcwLjIyOS4wABwEbmFtZQAVFHdpdC1jb21wb25lbnQ6Zml4dXBz');
     ({ exports: exports0 } = yield instantiateCore(yield module2));
     ({ exports: exports1 } = yield instantiateCore(yield module0, {
+      'wasi:clocks/monotonic-clock@0.2.9': {
+        now: trampoline0,
+      },
       wasi_snapshot_preview1: {
         environ_get: exports0['2'],
         environ_sizes_get: exports0['3'],
@@ -6596,16 +6812,16 @@ const $init = (() => {
         'get-environment': exports0['5'],
       },
       'wasi:cli/exit@0.2.3': {
-        exit: trampoline7,
+        exit: trampoline8,
       },
       'wasi:cli/stderr@0.2.3': {
-        'get-stderr': trampoline4,
+        'get-stderr': trampoline5,
       },
       'wasi:cli/stdin@0.2.3': {
-        'get-stdin': trampoline5,
+        'get-stdin': trampoline6,
       },
       'wasi:cli/stdout@0.2.3': {
-        'get-stdout': trampoline6,
+        'get-stdout': trampoline7,
       },
       'wasi:filesystem/preopens@0.2.3': {
         'get-directories': exports0['16'],
@@ -6615,19 +6831,19 @@ const $init = (() => {
         '[method]descriptor.get-type': exports0['9'],
         '[method]descriptor.stat': exports0['10'],
         '[method]descriptor.write-via-stream': exports0['7'],
-        '[resource-drop]descriptor': trampoline0,
+        '[resource-drop]descriptor': trampoline1,
         'filesystem-error-code': exports0['6'],
       },
       'wasi:io/error@0.2.3': {
-        '[resource-drop]error': trampoline2,
+        '[resource-drop]error': trampoline3,
       },
       'wasi:io/streams@0.2.3': {
         '[method]output-stream.blocking-flush': exports0['13'],
         '[method]output-stream.blocking-write-and-flush': exports0['14'],
         '[method]output-stream.check-write': exports0['11'],
         '[method]output-stream.write': exports0['12'],
-        '[resource-drop]input-stream': trampoline3,
-        '[resource-drop]output-stream': trampoline1,
+        '[resource-drop]input-stream': trampoline4,
+        '[resource-drop]output-stream': trampoline2,
       },
       'wasi:random/random@0.2.3': {
         'get-random-bytes': exports0['15'],
@@ -6647,21 +6863,21 @@ const $init = (() => {
         $imports: exports0.$imports,
         '0': exports2.fd_write,
         '1': exports2.random_get,
-        '10': trampoline13,
-        '11': trampoline14,
-        '12': trampoline15,
-        '13': trampoline16,
-        '14': trampoline17,
-        '15': trampoline18,
-        '16': trampoline19,
+        '10': trampoline14,
+        '11': trampoline15,
+        '12': trampoline16,
+        '13': trampoline17,
+        '14': trampoline18,
+        '15': trampoline19,
+        '16': trampoline20,
         '2': exports2.environ_get,
         '3': exports2.environ_sizes_get,
         '4': exports2.proc_exit,
-        '5': trampoline8,
-        '6': trampoline9,
-        '7': trampoline10,
-        '8': trampoline11,
-        '9': trampoline12,
+        '5': trampoline9,
+        '6': trampoline10,
+        '7': trampoline11,
+        '8': trampoline12,
+        '9': trampoline13,
       },
     }));
     realloc1 = exports1.cabi_realloc;
@@ -6672,30 +6888,39 @@ const $init = (() => {
       realloc1Async = exports1.cabi_realloc;
     }
     
-    postReturn0 = exports1['cabi_post_jsongrep:jsongrep/jsongrep@0.1.0#query-with-path'];
+    postReturn0 = exports1['cabi_post_jsongrep:jsongrep/jsongrep@0.1.0#query-with-timings'];
     
     try {
-      postReturn0Async = WebAssembly.promising(exports1['cabi_post_jsongrep:jsongrep/jsongrep@0.1.0#query-with-path']);
+      postReturn0Async = WebAssembly.promising(exports1['cabi_post_jsongrep:jsongrep/jsongrep@0.1.0#query-with-timings']);
     } catch(err) {
-      postReturn0Async = exports1['cabi_post_jsongrep:jsongrep/jsongrep@0.1.0#query-with-path'];
+      postReturn0Async = exports1['cabi_post_jsongrep:jsongrep/jsongrep@0.1.0#query-with-timings'];
     }
     
-    postReturn1 = exports1['cabi_post_jsongrep:jsongrep/jsongrep@0.1.0#query'];
+    postReturn1 = exports1['cabi_post_jsongrep:jsongrep/jsongrep@0.1.0#query-with-path'];
     
     try {
-      postReturn1Async = WebAssembly.promising(exports1['cabi_post_jsongrep:jsongrep/jsongrep@0.1.0#query']);
+      postReturn1Async = WebAssembly.promising(exports1['cabi_post_jsongrep:jsongrep/jsongrep@0.1.0#query-with-path']);
     } catch(err) {
-      postReturn1Async = exports1['cabi_post_jsongrep:jsongrep/jsongrep@0.1.0#query'];
+      postReturn1Async = exports1['cabi_post_jsongrep:jsongrep/jsongrep@0.1.0#query-with-path'];
     }
     
-    postReturn2 = exports1['cabi_post_jsongrep:jsongrep/jsongrep@0.1.0#query-first'];
+    postReturn2 = exports1['cabi_post_jsongrep:jsongrep/jsongrep@0.1.0#query'];
     
     try {
-      postReturn2Async = WebAssembly.promising(exports1['cabi_post_jsongrep:jsongrep/jsongrep@0.1.0#query-first']);
+      postReturn2Async = WebAssembly.promising(exports1['cabi_post_jsongrep:jsongrep/jsongrep@0.1.0#query']);
     } catch(err) {
-      postReturn2Async = exports1['cabi_post_jsongrep:jsongrep/jsongrep@0.1.0#query-first'];
+      postReturn2Async = exports1['cabi_post_jsongrep:jsongrep/jsongrep@0.1.0#query'];
     }
     
+    postReturn3 = exports1['cabi_post_jsongrep:jsongrep/jsongrep@0.1.0#query-first'];
+    
+    try {
+      postReturn3Async = WebAssembly.promising(exports1['cabi_post_jsongrep:jsongrep/jsongrep@0.1.0#query-first']);
+    } catch(err) {
+      postReturn3Async = exports1['cabi_post_jsongrep:jsongrep/jsongrep@0.1.0#query-first'];
+    }
+    
+    jsongrep010QueryWithTimings = exports1['jsongrep:jsongrep/jsongrep@0.1.0#query-with-timings'];
     jsongrep010QueryWithPath = exports1['jsongrep:jsongrep/jsongrep@0.1.0#query-with-path'];
     jsongrep010Query = exports1['jsongrep:jsongrep/jsongrep@0.1.0#query'];
     jsongrep010QueryFirst = exports1['jsongrep:jsongrep/jsongrep@0.1.0#query-first'];
@@ -6728,6 +6953,7 @@ const jsongrep010 = {
   query: query,
   queryFirst: queryFirst,
   queryWithPath: queryWithPath,
+  queryWithTimings: queryWithTimings,
   
 };
 
